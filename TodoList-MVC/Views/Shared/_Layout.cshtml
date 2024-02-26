@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TodoList_MVC</title>
+    <title>@ViewData["Title"] - Todo List</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TodoList_MVC.styles.css" asp-append-version="true" />
@@ -25,11 +25,45 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Register">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Login">Login</a>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+    <script>
+        function getAuthToken() {
+            const token = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('authToken='))
+                .split('=')[1];
+            return token;
+        }
+
+        function updateNavbar() {
+            const authLinks = document.getElementById('authLinks');
+            authLinks.innerHTML = '';
+
+            if (getAuthToken()) {
+                const userName = '@ViewBag.UserName'; 
+                authLinks.innerHTML = `
+                            <li class="nav-item">Hello, ${userName}</li>
+                            <li class="nav-item"><a href="/User/Logout">Logout</a></li>
+                        `;
+            } else {
+                authLinks.innerHTML = `
+                                    <li class="nav-item"><a href="/User/Login">Login</a></li>
+                                    <li class="nav-item"><a href="/User/Register">Register</a></li>
+                        `;
+            }
+        }
+        updateNavbar();
+    </script>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()

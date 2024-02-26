@@ -9,8 +9,8 @@ namespace TodoList_MVC.Data
         public TodoContext(DbContextOptions<TodoContext> options)
         : base(options) { }
 
-        DbSet<UserModel> Users { get; set; }
-        DbSet<TaskModel> Tasks { get; set; }
+        public DbSet<UserModel> Users { get; set; }
+        public DbSet<TaskModel> Tasks { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TaskModel>()
