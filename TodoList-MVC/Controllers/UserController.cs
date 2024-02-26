@@ -64,7 +64,7 @@ namespace TodoList_MVC.Controllers
                     });
 
                     ViewBag.UserName = user.Username;
-                    return RedirectToRoute(nameof(Index));   
+                    return RedirectToRoute(nameof(Index));
                 }
             } else return View();
         }
@@ -107,11 +107,19 @@ namespace TodoList_MVC.Controllers
             } else return View();
         }
 
-        [AllowAnonymous]    
+        [Authorize]
         public IActionResult Logout()
         {
             HttpContext.Response.Cookies.Delete("authToken");
             return RedirectToAction("Index");
+        }
+
+        [Authorize]
+        [HttpGet("user/name")]
+
+        public IActionResult GetUserName()
+        {
+            return View();
         }
 
     }

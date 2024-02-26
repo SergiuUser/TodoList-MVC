@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,13 +25,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  {
      options.TokenValidationParameters = new TokenValidationParameters
      {
-         ValidateIssuer = true,
-         ValidateAudience = true,
+         ValidateIssuer = false,
+         ValidateAudience = false,
          ValidateLifetime = true,
          ValidateIssuerSigningKey = true,
-         ValidIssuer = jwtIssuer,
-         ValidAudience = jwtIssuer,
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+     };
+     options.Events = new JwtBearerEvents
+     {
+         OnMessageReceived = context =>
+         {
+             context.Token = context.Request.Cookies["authToken"];
+             return Task.CompletedTask;
+         }
      };
  });
 
