@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Common;
-using System;
 using TodoList_MVC.Data;
 using TodoList_MVC.Models;
 using TodoList_MVC.Models.DTOs;
@@ -64,7 +62,7 @@ namespace TodoList_MVC.Controllers
                     });
 
                     ViewBag.UserName = user.Username;
-                    return RedirectToRoute(nameof(Index));
+                    return RedirectToAction("Index", "Task");
                 }
             } else return View();
         }
@@ -103,7 +101,7 @@ namespace TodoList_MVC.Controllers
                 });
 
                 ViewBag.UserName = user.Username;
-                return RedirectToAction("Index", "Home/Index");
+                return RedirectToAction("Index", "Task");
             } else return View();
         }
 
@@ -111,16 +109,7 @@ namespace TodoList_MVC.Controllers
         public IActionResult Logout()
         {
             HttpContext.Response.Cookies.Delete("authToken");
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Task");
         }
-
-        [Authorize]
-        [HttpGet("user/name")]
-
-        public IActionResult GetUserName()
-        {
-            return View();
-        }
-
     }
 }

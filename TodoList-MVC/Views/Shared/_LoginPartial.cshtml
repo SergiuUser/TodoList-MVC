@@ -1,0 +1,23 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    var isAuthenticated = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+    var token = HttpContextAccessor.HttpContext.Request.Cookies["authToken"];
+}
+<ul class="navbar-nav">
+    @if (isAuthenticated)
+{
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+        </li>
+}
+else
+{
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Login">Login</a>
+        </li>
+}
+</ul>
