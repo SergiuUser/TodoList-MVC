@@ -7,6 +7,7 @@ using TodoList_MVC.Models.DTOs;
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using TodoList_MVC.Services;
 
 namespace TodoList_MVC.Controllers
 {
@@ -14,11 +15,13 @@ namespace TodoList_MVC.Controllers
     {
         private readonly TodoContext _context;
         private readonly IMapper _mapper;
+        private readonly ITaskService _service;
 
-        public TaskController(TodoContext context, IMapper mapper)
+        public TaskController(TodoContext context, IMapper mapper, ITaskService service)
         {
             _context = context;
             _mapper = mapper;
+            _service = service;
         }
 
         public async Task<IActionResult> Index()
@@ -47,6 +50,7 @@ namespace TodoList_MVC.Controllers
 
         public IActionResult Create()
         {
+            ViewBag.Priorities = _service.GetPriorities();
             return View();
         }
 
@@ -57,10 +61,11 @@ namespace TodoList_MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                int userID = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
                 var entityMapped = _mapper.Map<TaskModel>(entity);
-                entityMapped.UserID = userID;
+
+                entityMapped.UserID = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
 
                 _context.Add(entityMapped);
                 await _context.SaveChangesAsync();
@@ -83,9 +88,9 @@ namespace TodoList_MVC.Controllers
             {
                 return NotFound();
             }
-            var entityMapper = _mapper.Map<TaskModel>(entity);
 
-            return View(entityMapper);
+            ViewBag.Priorities = _service.GetPriorities();
+            return View(entity);
         }
 
         [HttpPost]
@@ -102,11 +107,11 @@ namespace TodoList_MVC.Controllers
             {
                 try
                 {
-                    int userID = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
                     var entityMapped = _mapper.Map<TaskModel>(entity);
-                    entityMapped.UserID = userID;
-                    _context.Update(entity);
+
+                    entityMapped.UserID = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+                    _context.Update(entityMapped);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -160,5 +165,31 @@ namespace TodoList_MVC.Controllers
         {
             return _context.Tasks.Any(e => e.Id == id);
         }
+
+        [HttpPatch("api/tasks/markComplete/{id}")]
+        [Authorize]
+        public async Task<IActionResult> MarkComplete(int id)
+        {
+            var taskToUpdate = await _context.Tasks.FindAsync(id);
+            if (taskToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            if (taskToUpdate.UserID != Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            {
+                return Unauthorized();
+            }
+
+            if (taskToUpdate.isCompleted == false)
+            taskToUpdate.isCompleted = true;
+            else taskToUpdate.isCompleted = false;  
+
+            _context.Update(taskToUpdate);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
     }
 }

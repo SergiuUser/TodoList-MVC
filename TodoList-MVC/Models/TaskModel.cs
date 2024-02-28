@@ -15,6 +15,7 @@ namespace Todo_List_WebApp.Models
         public int UserID { get; set; }
         [Required(ErrorMessage = "Title is required")]
         public string Title { get; set; }
+        [MaxLength(100)]
         public string? Description { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
         [Required(ErrorMessage = "Due date is required")]

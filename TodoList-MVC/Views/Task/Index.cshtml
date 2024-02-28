@@ -4,13 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1 class="text-center">Todo List</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-secondary">Create New</a>
 </p>
-<table class="table">
-    <thead>
+<table class="table table-sm">
+    <thead class="table-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
@@ -19,53 +19,121 @@
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreationDate)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.DueDate)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Priority)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.isCompleted)
+                Action
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DueDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Priority)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.isCompleted)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model) {
+            @if (item.isCompleted == false)
+            {
+                <tr >
+                    <td class="text-white">
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td class="text-white">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td >
+                    <td class="text-white">
+                        @Html.DisplayFor(modelItem => item.DueDate)
+                    </td>
+                    <td class="text-white">
+                        @Html.DisplayFor(modelItem => item.Priority)
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">Edit</a></li>
+                                <li><a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">Details</a></li>
+                                <li><a asp-action="Delete" asp-route-id="@item.Id" class="dropdown-item">Delete</a></li>
+                                <li>
+                                    <button class="dropdown-item mark-complete-btn"
+                                            data-task-id="@item.Id"
+                                            data-is-completed="@item.isCompleted.ToString().ToLower()">
+                                        @(item.isCompleted ? "Completed" : "Mark Complete")
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+        }
+    }
+    </tbody>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item.isCompleted)
+            {
+                <tr>
+                    <td class="text-decoration-line-through text-danger">
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td class="text-decoration-line-through text-danger">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td class="text-decoration-line-through text-danger">
+                        @Html.DisplayFor(modelItem => item.DueDate)
+                    </td>
+                    <td class="text-decoration-line-through text-danger">
+                        @Html.DisplayFor(modelItem => item.Priority)
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">Edit</a></li>
+                                <li><a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">Details</a></li>
+                                <li><a asp-action="Delete" asp-route-id="@item.Id" class="dropdown-item">Delete</a></li>
+                                <li>
+                                    <button class="dropdown-item mark-complete-btn"
+                                            data-task-id="@item.Id"
+                                            data-is-completed="@item.isCompleted.ToString().ToLower()">
+                                        @(item.isCompleted ? "Completed" : "Mark Complete")
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
     </tbody>
 </table>
+
+<script>
+    const markCompleteButtons = document.querySelectorAll('.mark-complete-btn');
+
+    markCompleteButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const taskId = button.dataset.taskId;
+            const isCompleted = button.dataset.isCompleted === 'true';
+
+            const response = await fetch(`/api/tasks/markComplete/${taskId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                button.dataset.isCompleted = (!isCompleted).toString().toLowerCase();
+                button.textContent = (!isCompleted) ? 'Completed' : 'Mark Complete';
+                location.reload();
+            } else {
+                console.error('Error marking task complete');
+            }
+        });
+    });
+</script>

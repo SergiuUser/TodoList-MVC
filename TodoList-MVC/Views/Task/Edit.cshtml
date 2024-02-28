@@ -4,11 +4,8 @@
     ViewData["Title"] = "Edit";
 }
 
+<h1>Edit the task</h1>
 
-<h1>Edit</h1>
-
-<h4>TaskModel</h4>
-<hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
@@ -16,31 +13,31 @@
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
+                <input asp-for="Title" class="form-control bg-dark text-white " />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <input asp-for="Description" class="form-control bg-dark text-white " />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DueDate" class="control-label"></label>
-                <input asp-for="DueDate" class="form-control" />
+                <input asp-for="DueDate" class="form-control bg-dark text-white " />
                 <span asp-validation-for="DueDate" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Priority" class="control-label"></label>
-                <input asp-for="Priority" class="form-control"/>
+                <select asp-for="Priority" class="form-control bg-dark text-white ">
+                    @foreach (var priority in ViewBag.Priorities)
+                    {
+                        <option value="@priority.Value">@priority.Text</option>
+                    }
+                </select>
                 <span asp-validation-for="Priority" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isCompleted" /> @Html.DisplayNameFor(model => model.isCompleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="form-group" style="margin-top:10px">
+                <input type="submit" value="Save" class="btn btn-secondary" />
             </div>
         </form>
     </div>
